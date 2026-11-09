@@ -42,7 +42,7 @@ def create_server(db_path: Optional[str] = None,
         plant_name: Annotated[str, Field(min_length=1, description="Common name, e.g. 'tomato'")],
         latitude: Lat,
         longitude: Lon,
-        planted_on: Annotated[str, Field(description="ISO date, YYYY-MM-DD")],
+        planted_on: Optional[Annotated[str, Field(description="ISO date, YYYY-MM-DD")]] = None,
         variety: Optional[str] = None,
         notes: str = "",
     ) -> dict:

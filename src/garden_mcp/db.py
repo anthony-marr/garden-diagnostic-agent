@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS plantings (
     variety TEXT,
     latitude REAL NOT NULL CHECK (latitude BETWEEN -90 AND 90),
     longitude REAL NOT NULL CHECK (longitude BETWEEN -180 AND 180),
-    planted_on TEXT NOT NULL,
+    planted_on TEXT,
     notes TEXT NOT NULL DEFAULT ''
 );
 CREATE TABLE IF NOT EXISTS observations (

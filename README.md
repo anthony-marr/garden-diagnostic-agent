@@ -41,7 +41,7 @@ frost, heat, water deficit versus evapotranspiration, excess water, and wind.
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest -q        # 40 tests, no network needed (Open-Meteo is mocked)
+python -m pytest -q        # 45 tests, no network needed (Open-Meteo and the model are mocked)
 python -m garden_mcp.demo  # end-to-end: seeds sample data, live weather, agent check
 ```
 
@@ -69,6 +69,26 @@ container-garden log (raised beds, buckets, and pots in Washington, DC):
 13 plantings and 11 dated field observations logged from the garden's photo
 record. Planting dates are left out where they aren't known; the observations
 carry the real dates.
+
+## LLM mode (optional)
+
+`agent.py` chains the tools in a fixed order. For natural-language questions,
+`llm_agent.py` hands the same MCP tools to a hosted Hugging Face model and
+lets the model pick and chain the calls itself:
+
+```bash
+export HF_TOKEN=hf_...   # free at https://huggingface.co/settings/tokens
+python -m garden_mcp.llm_agent ask "why are my tomatoes dropping blossoms?" --db garden.db
+```
+
+The loop: the model sees the server's tool schemas (`list_tools`), returns
+tool calls, the host executes them over MCP and feeds the results back, until
+the model answers in plain text (at most 8 rounds). The default model is
+`meta-llama/Llama-3.3-70B-Instruct` on the Hugging Face router
+(`router.huggingface.co`, free Inference API); override with `--model`.
+The Hugging Face endpoint is mocked in the tests, so CI never needs a token
+or the network. The deterministic garden check above stays the default; LLM
+mode is additive.
 
 ## Sample output
 

@@ -33,13 +33,13 @@ class PlantingCreate(BaseModel):
     variety: Optional[str] = Field(default=None, max_length=120)
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
-    planted_on: str
+    planted_on: Optional[str] = None
     notes: str = ""
 
     @field_validator("planted_on")
     @classmethod
-    def _check_planted_on(cls, v: str) -> str:
-        return _iso_date(v)
+    def _check_planted_on(cls, v: Optional[str]) -> Optional[str]:
+        return None if v is None else _iso_date(v)
 
 
 class Planting(PlantingCreate):

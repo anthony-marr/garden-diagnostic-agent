@@ -61,3 +61,9 @@ def test_rows_persist_across_connections(tmp_path):
     second = GardenDB(path)
     assert [p.plant_name for p in second.list_plantings()] == ["pepper"]
     second.close()
+
+
+def test_planting_date_optional(db):
+    created = db.add_planting(PlantingCreate(
+        plant_name="dill", latitude=38.92, longitude=-77.03))
+    assert created.planted_on is None

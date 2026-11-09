@@ -1,0 +1,17 @@
+{
+  "plantings": [
+    {"plant_name": "tomato", "variety": "Roma",
+     "latitude": 38.9072, "longitude": -77.0369,
+     "planted_on": "2026-04-15", "notes": "raised bed, full sun"},
+    {"plant_name": "basil", "variety": "Genovese",
+     "latitude": 38.9072, "longitude": -77.0369,
+     "planted_on": "2026-05-01", "notes": "container"},
+    {"plant_name": "bell pepper",
+     "latitude": 38.9072, "longitude": -77.0369,
+     "planted_on": "2026-04-20"}
+  ],
+  "observations": [
+    {"planting_index": 0, "observed_on": "2026-06-10",
+     "note": "first flowers on the Roma vines"}
+  ]
+}

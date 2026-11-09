@@ -1,5 +1,7 @@
 # Garden Diagnostic Agent
 
+[![Tests](https://github.com/anthony-marr/garden-diagnostic-agent/actions/workflows/tests.yml/badge.svg)](https://github.com/anthony-marr/garden-diagnostic-agent/actions/workflows/tests.yml)
+
 An MCP (Model Context Protocol) server and agent host for diagnosing garden
 plant stress. The server exposes two data sources as MCP tools - Open-Meteo
 weather and a SQLite planting log - and the agent host connects over MCP and
@@ -39,7 +41,7 @@ frost, heat, water deficit versus evapotranspiration, excess water, and wind.
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest -q        # 39 tests, no network needed (Open-Meteo is mocked)
+python -m pytest -q        # 40 tests, no network needed (Open-Meteo is mocked)
 python -m garden_mcp.demo  # end-to-end: seeds sample data, live weather, agent check
 ```
 
@@ -61,6 +63,44 @@ Load your own garden data (format in `src/garden_mcp/seed.py` docstring):
 ```bash
 python -m garden_mcp.seed data/sample_garden.json --db garden.db
 ```
+
+`data/sample_garden.json` is synthetic. `data/garden_2026.json` is a real
+container-garden log (raised beds, buckets, and pots in Washington, DC):
+13 plantings and 11 dated field observations logged from the garden's photo
+record. Planting dates are left out where they aren't known; the observations
+carry the real dates.
+
+## Sample output
+
+A real garden check against that log (live Open-Meteo weather for the
+garden's coordinates, trimmed to one planting):
+
+```json
+{
+  "checked_plantings": 13,
+  "diagnoses": [
+    {
+      "planting_id": 6,
+      "plant_name": "tomato",
+      "flags": [
+        {
+          "kind": "dry",
+          "severity": "high",
+          "detail": "Only 1.6 mm of rain against 13.2 mm evapotranspiration over the past 7 days (12% of demand)."
+        }
+      ],
+      "summary": "tomato: 1 stress signal(s) - dry (high).",
+      "recommendations": [
+        "Increase watering frequency; soil moisture is not keeping up with evapotranspiration."
+      ]
+    }
+  ],
+  "summary": "Checked 13 planting(s): 13 with stress signals, 0 clear."
+}
+```
+
+Every diagnosis traces back to the weather numbers in its `detail`, so the
+report can be checked against the forecast it used.
 
 ## Tools
 

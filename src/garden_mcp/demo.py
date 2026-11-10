@@ -1,5 +1,7 @@
-"""End-to-end demo: seeds sample garden data, then runs an agent garden check
-against live Open-Meteo weather. Prints the report as JSON.
+"""End-to-end demo: seeds the garden's real 2026 growing-season log
+(data/garden_2026.json, falling back to a small synthetic sample), then runs
+an agent garden check against live Open-Meteo weather. Prints the report as
+JSON.
 
     python -m garden_mcp.demo
 """
@@ -36,11 +38,15 @@ SAMPLE = {
 }
 
 
+DATA_FILE = Path(__file__).resolve().parents[2] / "data" / "garden_2026.json"
+
+
 async def run() -> dict:
+    data = json.loads(DATA_FILE.read_text()) if DATA_FILE.exists() else SAMPLE
     with tempfile.TemporaryDirectory() as tmp:
         db_path = str(Path(tmp) / "demo.db")
         db = GardenDB(db_path)
-        seed(db, SAMPLE)
+        seed(db, data)
         db.close()
         server = create_server(db_path=db_path)
         async with create_connected_server_and_client_session(server._mcp_server) as session:

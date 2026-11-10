@@ -36,13 +36,20 @@ Every tool validates its inputs and outputs with pydantic models
 empty names fail at the boundary instead of corrupting the log. Diagnostics
 are transparent rules over the weather window (`src/garden_mcp/diagnostics.py`):
 frost, heat, water deficit versus evapotranspiration, excess water, and wind.
+Each rule is tuned per crop (`src/garden_mcp/crops.py`): water demand is
+ET0 scaled by the FAO-56 mid-season crop coefficient (Kc, Allen et al. 1998,
+Table 12), and frost/heat thresholds follow rule-of-thumb tolerances from
+university extension guides - tender crops damaged at 0C, hardy greens only
+in a hard frost, cool-season greens bolting in sustained heat. So the same
+weather window can flag a tomato and spare the kale next to it. Unknown
+crops fall back to the generic thresholds.
 
 ## Quickstart
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest -q        # 45 tests, no network needed (Open-Meteo and the model are mocked)
-python -m garden_mcp.demo  # end-to-end: seeds sample data, live weather, agent check
+python -m pytest -q        # 53 tests, no network needed (Open-Meteo and the model are mocked)
+python -m garden_mcp.demo  # end-to-end: seeds the 2026 garden log, live weather, agent check
 ```
 
 Run the server for any MCP host (Claude Desktop, etc.):
@@ -64,11 +71,12 @@ Load your own garden data (format in `src/garden_mcp/seed.py` docstring):
 python -m garden_mcp.seed data/sample_garden.json --db garden.db
 ```
 
-`data/sample_garden.json` is synthetic. `data/garden_2026.json` is a real
-container-garden log (raised beds, buckets, and pots in Washington, DC):
-13 plantings and 11 dated field observations logged from the garden's photo
-record. Planting dates are left out where they aren't known; the observations
-carry the real dates.
+`data/garden_2026.json` is a real container-garden log (raised beds, buckets,
+and pots in Washington, DC): 13 plantings and 11 dated field observations
+logged from the garden's photo record. Planting dates are left out where
+they aren't known; the observations carry the real dates. The demo above
+seeds this log, so a check runs the 2026 growing season against current
+weather. `data/sample_garden.json` is a small synthetic fallback.
 
 ## LLM mode (optional)
 
@@ -106,7 +114,7 @@ garden's coordinates, trimmed to one planting):
         {
           "kind": "dry",
           "severity": "high",
-          "detail": "Only 1.6 mm of rain against 13.2 mm evapotranspiration over the past 7 days (12% of demand)."
+          "detail": "Only 1.6 mm of rain against 15.2 mm crop-adjusted demand (13.2 mm ET0 x Kc 1.15) over the past 7 days (11% of demand)."
         }
       ],
       "summary": "tomato: 1 stress signal(s) - dry (high).",
@@ -148,6 +156,7 @@ src/garden_mcp/
   schemas.py      pydantic models: the checked I/O boundary for every tool
   db.py           SQLite planting log (plantings + observations)
   weather.py      Open-Meteo client (free, no API key)
+  crops.py        per-crop profiles: FAO-56 water demand, frost/heat tolerances
   diagnostics.py  stress rules over the weather window
   server.py       FastMCP server exposing the tools
   agent.py        agent host that chains the tools

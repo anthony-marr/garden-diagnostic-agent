@@ -15,7 +15,7 @@ from typing import Annotated, Optional
 from mcp.server.fastmcp import FastMCP
 from pydantic import Field
 
-from . import diagnostics
+from . import crops, diagnostics
 from .db import DEFAULT_DB_PATH, GardenDB, PlantingNotFoundError
 from .schemas import (Diagnosis, ObservationCreate, PlantingCreate)
 from .weather import OpenMeteoClient
@@ -95,7 +95,8 @@ def create_server(db_path: Optional[str] = None,
             raise ValueError(str(exc))
         report = weather.get_daily(planting.latitude, planting.longitude,
                                    past_days=past_days, forecast_days=3)
-        flags, recommendations = diagnostics.assess(report.past, report.forecast)
+        profile = crops.profile_for(planting.plant_name)
+        flags, recommendations = diagnostics.assess(report.past, report.forecast, profile)
         return Diagnosis(
             planting_id=planting.id,
             plant_name=planting.plant_name,

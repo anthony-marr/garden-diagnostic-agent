@@ -48,7 +48,7 @@ crops fall back to the generic thresholds.
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest -q        # 53 tests, no network needed (Open-Meteo and the model are mocked)
+python -m pytest -q        # offline tests; Open-Meteo and the model are mocked
 python -m garden_mcp.demo  # end-to-end: seeds the 2026 garden log, live weather, agent check
 ```
 

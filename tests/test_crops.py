@@ -103,3 +103,19 @@ def test_server_diagnoses_with_crop_profile(tmp_path):
     tomato_diag, kale_diag = asyncio.run(go())
     assert any(f["kind"] == "frost" for f in tomato_diag["flags"])
     assert not any(f["kind"] == "frost" for f in kale_diag["flags"])
+
+
+def test_pepper_and_eggplant_profiles():
+    pepper = profile_for("bell pepper")
+    assert pepper.kc == 1.05
+    assert pepper.heat_c == 32.0
+    assert pepper.frost_high_c == 0.0  # tender
+    assert profile_for("jalapeno pepper") == pepper
+    eggplant = profile_for("eggplant")
+    assert eggplant.kc == 1.05
+    assert profile_for("aubergine") == eggplant
+
+
+def test_pepper_flags_light_frost_that_hardy_greens_tolerate():
+    flags, _ = assess_payload(profile_for("bell pepper"), temp_min=1.0)
+    assert StressKind.FROST in kinds(flags)

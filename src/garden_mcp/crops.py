@@ -40,7 +40,8 @@ _HARDY = {"frost_high_c": -2.0, "frost_near_c": 0.0}
 
 # keyword -> profile. Kc values come from FAO-56 Table 12 (mid-season):
 # lettuce 1.00, spinach 1.00, tomato 1.15, cucumber 1.00, green beans 1.05,
-# radish 0.85. Others default to the leafy-vegetable Kc of 1.0.
+# radish 0.85, pepper 1.05, eggplant 1.05. Others default to the
+# leafy-vegetable Kc of 1.0.
 _PROFILES: list[tuple[str, CropProfile]] = [
     ("lettuce", CropProfile(kc=1.00, heat_c=27.0, **_HARDY)),
     ("spinach", CropProfile(kc=1.00, heat_c=27.0, **_HARDY)),
@@ -56,6 +57,10 @@ _PROFILES: list[tuple[str, CropProfile]] = [
     ("cucumber", CropProfile(kc=1.00, heat_c=35.0, **_TENDER)),
     ("squash", CropProfile(kc=1.00, heat_c=35.0, **_TENDER)),
     ("cucurbit", CropProfile(kc=1.00, heat_c=35.0, **_TENDER)),
+    # tender nightshades: blossom drop in sustained heat above ~32C
+    ("pepper", CropProfile(kc=1.05, heat_c=32.0, **_TENDER)),
+    ("eggplant", CropProfile(kc=1.05, heat_c=35.0, **_TENDER)),
+    ("aubergine", CropProfile(kc=1.05, heat_c=35.0, **_TENDER)),
 ]
 
 
